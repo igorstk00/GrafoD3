@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>D3.js</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script> 
+    <style>
+        svg {
+            background: #ccc;
+        }
+        
+        .links line {
+            stroke: #aaa;
+        }
+
+        .nodes circle {
+            pointer-events: all;
+            stroke: none;
+        }
+    </style>
+</head>
+<body>
+
+    <script>
+        d3.select("body").append("p").text("Ola mundo!");        
+        console.log(d3);
+    </script>
+    <!--
+    <script>
+
+        var dataArray = [30, 15, 50, 40, 15, 23, 67];
+        var width = 500;
+        var height = 500;
+        var aux;
+        var canvas = d3.select("body")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+
+        /*var widthScale = d3.scale.linear()
+                            .domain([0, 80])
+                            .range([0, width]);
+*/
+        var bars = canvas.selectAll("circle")
+                        .data(dataArray)
+                        .enter()
+                        .append("circle")
+                        .attr("r", 20)
+                        .attr("id", function(d, i){ return i; })
+                        .attr("fill", "blue")
+                        .attr("selected", false)
+                        .attr("cy", function(d, i) { return Math.random() * (400 - 100) + 100 })
+                        .attr("cx", function(d, i) { return Math.random() * (400 - 100) + 100});
+
+        bars.on("click", function(d, i) {
+            if( aux == undefined){
+                aux = i;
+                return d3.select(this)
+                        .transition()
+                        .duration(500)
+                        .attr("r", 50);
+            }else if (aux == i){
+                aux = undefined;
+                return d3.select(this)
+                        .transition()
+                        .duration(500)
+                        .attr("r", 20);   
+            }
+        });
+
+
+        /*var button = canvas.append("rect")
+                            .attr("width", 100)
+                            .attr("height", 100)
+                            .attr("x", 400)
+                            .attr("y", 400)
+                            .attr("fill", "blue");
+
+        button.on("click", function(){ 
+            return bars.transition()
+                    .duration(1500)
+                    .attr("fill", "red")
+                    .attr("r", function(d) { return d; })
+                    });
+        */
+
+        /*bars.transition()
+            .duration(1500)
+            .attr("fill", "red")
+            .attr("r", function(d) { return d; });
+        */
+
+        /*var circle = canvas.append("circle")
+                            .attr("cx", 100)
+                            .attr("cy", 150)
+                            .attr("r", 50)
+                            .attr("fill", "red");
+
+        var rect = canvas.append("rect")
+                            .attr("width", 100)
+                            .attr("height", 50)
+                            .attr("fill", "#999");
+
+        var line = canvas.append("line")
+                            .attr("x1", 0)
+                            .attr("y1", 100)
+                            .attr("x2", 300)
+                            .attr("y2", 200)
+                            .attr("stroke", "blue")
+                            .attr("stroke-width", 5);
+        */
+
+    </script>
+-->
+    
+    <script>
+
+        var width = 500, height = 500
+        var aux;
+
+        var canvas = d3.select("body")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+        
+        var svg = d3.select("svg");
+
+        var nodes = [
+        //Math.random() * (400 - 100) + 100   //Gerar randomico
+        {val:'0', radius: 70},
+        {val:'1', radius: 70},
+        {val:'2', radius: 70},
+        {val:'3', radius: 70},
+        {val:'4', radius: 70},
+        {val:'5', radius: 70},
+        {val:'6', radius: 70},
+        {val:'7', radius: 70},
+        {val:'8', radius: 70}
+        ]
+
+        var links = [
+        {source: 0, target: 1},
+        {source: 0, target: 4},
+        {source: 0, target: 6},
+        {source: 0, target: 7},
+        {source: 1, target: 2},
+        {source: 4, target: 3},
+        {source: 6, target: 5},
+        {source: 7, target: 8}
+        ]
+
+        var simulation = d3.forceSimulation(nodes)
+        .velocityDecay(0.93)
+        .force('charge', d3.forceManyBody().strength(-30))
+        .force('center', d3.forceCenter(width / 2, height / 2))
+        .force('link', d3.forceLink().links(links))
+        .force('collision', d3.forceCollide().strength(0.3).radius(function(d){
+            return d.radius;
+        }))
+        .on('tick', ticked);
+
+        var link = svg.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(links)
+            .enter().append("line")
+            .attr("stroke", "black");
+        
+        var node = svg.append("g")
+            .attr("class", "nodes")
+            .selectAll("circle")
+            .data(nodes)
+            .enter().append("circle")
+            .attr("r", 20)
+            .attr("fill", "red")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        var ponto = d3.selectAll('circle')
+            .on('click', function(d, i){
+                if(aux == undefined){
+                    aux = i;
+                    //simulation.force('collision', d3.forceCollide().radius(35));
+                    d.radius = 100;
+                    simulation.force('collision', d3.forceCollide().strength(1).radius(function(d){
+                        return d.radius;
+                    }))
+                    return d3.select(this)
+                            .transition()
+                            .duration(1500)
+                            .attr('r', 80);
+                    
+                }else if (aux == i){
+                    aux = undefined;
+                    d.radius = 70;
+                    simulation.force('collision', d3.forceCollide().radius(function(d){
+                        return d.radius;
+                    }))
+                    return d3.select(this)
+                            .transition()
+                            .duration(700)
+                            .attr("r", 20); 
+                }
+                
+            })
+
+        function ticked() {
+            link
+                .attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node
+                .attr("cx", function(d) { return d.x; })
+                .attr("cy", function(d) { return d.y; });
+        }
+
+        function dragstarted(d) {
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = d3.event.x;
+            d.fy = d3.event.y;
+        }
+
+        function dragended(d) {
+            if (!d3.event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+    </script>
+
+</body>
+</html>

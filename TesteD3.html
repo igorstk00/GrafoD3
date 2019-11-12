@@ -1,16 +1,16 @@
-<!doctype html>
+  <!doctype html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>D3.js</title>
+    <title>Design Thinking Tool</title>
     <script src="https://d3js.org/d3.v5.min.js"></script> 
     <style>
         svg {
-            background: #ccc;
+            background: rgb(255, 255, 255);
         }
         
         .links line {
-            stroke: #aaa;
+            stroke: rgb(0, 0, 0);
         }
 
         .nodes circle {
@@ -20,19 +20,14 @@
 
         .nodes text {
             text-align: center;
-            fill: coral;
             font: italic;
+            fill: rgb(48, 39, 180);
             font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
             text-anchor: middle;
         }
     </style>
 </head>
 <body>
-
-    <script>
-        d3.select("body").append("p").text("Ola mundo!");        
-        console.log(d3);
-    </script>
     <!--
     <script>
 
@@ -123,8 +118,12 @@
     
     <script>
 
-        var width = 500, height = 500
+        var width = 1285, height = 645
         var aux;
+
+        var raio = function(d){
+                return (parseInt(d.val)+1) * 5;
+        }
 
         var canvas = d3.select("body")
                         .append("svg")
@@ -135,15 +134,15 @@
 
         var nodes = [
         //Math.random() * (400 - 100) + 100   //Gerar randomico
-        {val:'0', radius: 70},
-        {val:'1', radius: 70},
-        {val:'2', radius: 70},
-        {val:'3', radius: 70},
-        {val:'4', radius: 70},
-        {val:'5', radius: 70},
-        {val:'6', radius: 70},
-        {val:'7', radius: 70},
-        {val:'8', radius: 70}
+        {val: 1, radius: 70},
+        {val: 2, radius: 70},
+        {val: 3, radius: 70},
+        {val: 4, radius: 70},
+        {val: 5, radius: 70},
+        {val: 6, radius: 70},
+        {val: 7, radius: 70},
+        {val: 8, radius: 70},
+        {val: 9, radius: 70}
         ]
 
         var links = [
@@ -159,7 +158,7 @@
 
         var simulation = d3.forceSimulation(nodes)
         .velocityDecay(0.93)
-        .force('charge', d3.forceManyBody().strength(-100))
+        .force('charge', d3.forceManyBody().strength(-30))
         .force('center', d3.forceCenter(width / 2, height / 2))
         .force('link', d3.forceLink().links(links))
         .force('collision', d3.forceCollide().strength(0.3).radius(function(d){
@@ -172,7 +171,8 @@
             .selectAll("line")
             .data(links)
             .enter().append("line")
-            .attr("stroke", "black");
+            .attr("stroke", "black")
+            .attr("stroke-width", 3);
 
         var g = svg.append("g")
             .attr("class", "nodes")
@@ -181,7 +181,7 @@
             .enter();
 
         var node = g.append("circle")
-            .attr("r", 20)
+            .attr("r", raio)
             .attr("fill", "red")
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -213,14 +213,14 @@
                     
                 }else if (aux == i){
                     aux = undefined;
-                    d.radius = 70;
+                    d.radius = raio(d) + 15;
                     simulation.force('collision', d3.forceCollide().radius(function(d){
                         return d.radius;
                     }))
                     return d3.select(this)
                             .transition()
                             .duration(700)
-                            .attr("r", 20); 
+                            .attr("r", raio); 
                 }
                 
             })
@@ -238,7 +238,7 @@
             
             texto
                 .attr("x", function(d){ return d.x;})
-                .attr("y", function(d){ return d.y + 35});
+                .attr("y", function(d){ return d.y + 15 + ((parseInt(d.val)+1)*5)});
         }
 
         function dragstarted(d) {

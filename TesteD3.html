@@ -120,10 +120,11 @@
 
         var width = 1285, height = 645
         var aux;
-
-        var raio = function(d){
-                return (parseInt(d.val)+1) * 5;
-        }
+        
+        var raio = 10
+        //function(d){
+                //return (parseInt(d.val)+1) * 5;
+        //}
 
         var canvas = d3.select("body")
                         .append("svg")
@@ -131,8 +132,15 @@
                         .attr("height", height);
         
         var svg = d3.select("svg");
+        var numNodes = 100
+        var nodes = d3.range(numNodes).map(function(d){
+            return {val: d, radius: 30}
+        })
 
-        var nodes = [
+        var links = d3.range(numNodes).map(function(d){
+            return {source: d, target: (Math.floor(Math.random() * 100))}
+        })
+        /*var nodes = [
         //Math.random() * (400 - 100) + 100   //Gerar randomico
         {val: 1, radius: 70},
         {val: 2, radius: 70},
@@ -154,16 +162,18 @@
         {source: 3, target: 4},
         {source: 5, target: 6},
         {source: 7, target: 8}
-        ]
+        ]*/
 
         var simulation = d3.forceSimulation(nodes)
-        .velocityDecay(0.93)
-        .force('charge', d3.forceManyBody().strength(-30))
+        //.velocityDecay(0.93)
+        .force('charge', d3.forceManyBody())
         .force('center', d3.forceCenter(width / 2, height / 2))
-        .force('link', d3.forceLink().links(links))
+        .force('link', d3.forceLink().links(links).distance(0).strength(1))
         .force('collision', d3.forceCollide().strength(0.3).radius(function(d){
             return d.radius;
         }))
+        .force("x", d3.forceX())
+        .force("y", d3.forceY())
         .on('tick', ticked);
 
         var link = svg.append("g")
@@ -208,12 +218,12 @@
                     }))
                     return d3.select(this)
                             .transition()
-                            .duration(1500)
+                            .duration(700)
                             .attr('r', 80);
                     
                 }else if (aux == i){
                     aux = undefined;
-                    d.radius = raio(d) + 15;
+                    d.radius = 30;
                     simulation.force('collision', d3.forceCollide().radius(function(d){
                         return d.radius;
                     }))
@@ -238,11 +248,11 @@
             
             texto
                 .attr("x", function(d){ return d.x;})
-                .attr("y", function(d){ return d.y + 15 + ((parseInt(d.val)+1)*5)});
+                .attr("y", function(d){ return d.y + d.radius});
         }
 
         function dragstarted(d) {
-            if (!d3.event.active) simulation.alphaTarget(0.1).restart();
+            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
             d.fy = d.y;
         }

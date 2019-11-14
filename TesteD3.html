@@ -121,7 +121,7 @@
         var width = 1285, height = 645
         var aux;
         
-        var raio = 10
+        var raio = 20
         //function(d){
                 //return (parseInt(d.val)+1) * 5;
         //}
@@ -134,7 +134,7 @@
         var svg = d3.select("svg");
         var numNodes = 100
         var nodes = d3.range(numNodes).map(function(d){
-            return {val: d, radius: 30}
+            return {val: d, radius: 15}
         })
 
         var links = d3.range(numNodes).map(function(d){
@@ -163,6 +163,10 @@
         {source: 5, target: 6},
         {source: 7, target: 8}
         ]*/
+    var button = svg.append('rect')
+                    .attr('width', 150)
+                    .attr('height', 150)
+                    .attr('fill', 'red');
 
         var simulation = d3.forceSimulation(nodes)
         //.velocityDecay(0.93)
@@ -186,12 +190,23 @@
 
         var g = svg.append("g")
             .attr("class", "nodes")
-            .selectAll("circle")
+            .selectAll("rect")
             .data(nodes)
             .enter();
 
-        var node = g.append("circle")
+        /*var node = g.append("circle")
             .attr("r", raio)
+            .attr("fill", "red")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));*/
+
+        var node = g.append("rect")
+            .attr("width", 20)
+            .attr("height", 20)
+            .attr("rx", 20)
+            .attr("ry", 20)
             .attr("fill", "red")
             .call(d3.drag()
                 .on("start", dragstarted)
@@ -243,8 +258,8 @@
                 .attr("y2", function(d) { return d.target.y; });
 
             node
-                .attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
+                .attr("x", function(d) { return d.x - raio/2; })
+                .attr("y", function(d) { return d.y - raio/2; });
             
             texto
                 .attr("x", function(d){ return d.x;})
@@ -252,7 +267,7 @@
         }
 
         function dragstarted(d) {
-            if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+            if (!d3.event.active) simulation.alphaTarget(0.01).restart();
             d.fx = d.x;
             d.fy = d.y;
         }

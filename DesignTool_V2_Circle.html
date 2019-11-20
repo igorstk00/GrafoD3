@@ -22,6 +22,10 @@
         var area = 10;
         var aux;
 
+        var r = 0;
+        var g = 200;
+        var b = 0;
+
         var body = d3.select('body'); // Seleciona body        
         body.append('svg') // Adiciona SVG ao body com Largura e Altura de 500px
             .attr('width', width)
@@ -71,7 +75,9 @@
         var nodeCircle = classNode.append('circle')
             .attr('id', function(d){ return d.index; })
             .attr('r', area)
-            .attr('fill', 'red')
+            .attr('fill', function(){
+                return 'rgb('+r+','+g+','+b+')';
+            })
             .call(d3.drag()
                 .on('start', dragstarted)
                 .on('drag', dragged)
